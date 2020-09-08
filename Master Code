@@ -1,0 +1,435 @@
+int trigger1;
+long randomS;
+long cStartT = -1;
+long startT = -1;
+int echo1;
+int trigger2;
+int echo2;
+int trigger3;
+int echo3;
+int trigger4;
+int echo4;
+long duration = 0;
+int ledO1;
+int ledO2;
+int ledO3;
+int ledO4;
+int ledI1;
+int ledI2;
+int ledI3;
+int ledI4;
+int butStart;
+int butSlav;
+int buzzerPin;
+int start;
+long mil;
+long future;
+int randomN;
+long future2;
+int checkIfTouched;
+int life;
+int ledLife;
+int NOTE_C4 =  262;
+int NOTE_CS4 = 277;
+int NOTE_D4 =  294;
+int NOTE_DS4 = 311;
+int NOTE_E4 =  330;
+int NOTE_F4 =  349;
+int NOTE_FS4 = 370;
+int NOTE_G4 =  392;
+int NOTE_GS4 = 415;
+int NOTE_A4 =  440;
+int NOTE_AS4 = 466;
+int NOTE_B4 =  494;
+int NOTE_C5 =  523;
+int NOTE_CS5 = 554;
+int NOTE_D5 =  587;
+int NOTE_DS5 = 622;
+int NOTE_E5 =  659;
+int NOTE_F5 =  698;
+int NOTE_FS5 = 740;
+int NOTE_G5 =  784;
+int NOTE_GS5 = 831;
+int NOTE_A5 =  880;
+int NOTE_AS5 = 932;
+int NOTE_B5 =  988;
+
+long distance_mm1;
+long distance_mm2;
+long distance_mm3;
+long distance_mm4;
+void setup() {
+  // put your setup code here, to run once:
+  future = 0;
+  life = 3;
+  checkIfTouched = 0;
+  future2 = 0;
+  //Set the values for the tigger pin and the echo pin ********************
+  trigger1 = 13;
+  trigger2 = 12;
+  trigger3 = 8;
+  trigger4 = 7;
+  echo1 = 11;
+  echo2 = 10;
+  echo3 = 9;
+  echo4 = 6;
+  ledO1 = 5;
+  ledO2 = 4;
+  ledO3 = 3;
+  ledO4 = 2;
+  ledI1 = A5;
+  ledI2 = A4;
+  ledI3 = A3;
+  ledI4 = 1;
+  ledLife = 0;
+  buzzerPin = A2;
+  butStart = A0;
+  butSlav = A1;
+  randomN = -1;
+  pinMode(trigger1, OUTPUT);
+  pinMode(echo1, INPUT);
+  pinMode(trigger2, OUTPUT);
+  pinMode(echo2, INPUT);
+  pinMode(trigger3, OUTPUT);
+  pinMode(echo3, INPUT);
+  pinMode(trigger4, OUTPUT);
+  pinMode(echo4, INPUT);
+  pinMode(ledO1, OUTPUT);
+  pinMode(ledO2, OUTPUT);
+  pinMode(ledO3, OUTPUT);
+  pinMode(ledO4, OUTPUT);
+  pinMode(ledI1, OUTPUT);
+  pinMode(ledI2, OUTPUT);
+  pinMode(ledI3, OUTPUT);
+  pinMode(ledI4, OUTPUT);
+  pinMode(ledLife, OUTPUT);
+  pinMode(butStart, INPUT);
+  pinMode(butSlav, INPUT);
+  pinMode(buzzerPin, OUTPUT);
+  randomS = 0;
+  randomSeed(randomS);
+}
+
+void loop() {
+
+
+
+ 
+  mil = millis();
+  Serial.print(" start state: ");
+  Serial.print(start);
+  Serial.print(" life total: ");
+  Serial.print(life);
+  Serial.print(" but state 1: ");
+  Serial.print(digitalRead(butStart));
+  Serial.print(" but state 2: ");
+  Serial.println(digitalRead(butSlav));
+
+ 
+  if(digitalRead(butStart)==1 && start == 0 && future < mil){
+    start = 1;
+    future = mil + 500;
+    startT = mil;
+  }
+  else if(digitalRead(butStart)==1 && start == 1 && future < mil){
+    start = 0;
+    future = mil + 500;
+  }
+
+  if(digitalRead(butSlav) == 1){
+    start = 2;
+  }
+
+
+  if(start == 1){
+   
+      if(randomN == -1){
+      randomN = random(4);
+      randomS++;
+      }
+      Serial.println(randomN);
+      if(life == 0){
+        start = 2;
+      }
+
+
+     
+      if((mil - startT) % 60000 < 5000){
+        Serial.println("rest pd");  
+      }
+      else if((mil-startT) % 60000 < 20000 && (mil-startT) > 5000){
+        controlLeds(randomN, 3000);
+        Serial.println("1");
+        if(future2 < mil){
+          if(checkIfTouched == 0){
+            life--;
+          }
+          else{
+            checkIfTouched = 0;
+          }
+          randomN = -1;
+          future2 = mil + 1500;
+        }
+      }
+      else if((mil-startT) % 60000 < 40000 && (mil-startT) > 21000){
+        Serial.println("2");
+        controlLeds(randomN, 2000);
+        if(future2 < mil){
+          if(checkIfTouched == 0){
+            life--;
+          }
+          else{
+            checkIfTouched = 0;
+          }
+          randomN = -1;
+          future2 = mil + 1000;
+        }
+      }
+      else if((mil-startT) % 60000 < 59000 && (mil-startT) > 41000){
+        Serial.println("2");
+        controlLeds(randomN, 1000);
+        if(future2 < mil){
+          if(checkIfTouched == 0){
+            life--;
+          }
+          else{
+            checkIfTouched = 0;
+          }
+        randomN = -1;
+        future2 = mil + 500;
+        }
+      }
+  }
+
+  if(start == 2){
+
+
+  int melody[] = {
+  NOTE_G4, NOTE_C5, NOTE_G4, NOTE_A4, NOTE_B4, NOTE_E4, NOTE_E4,
+  NOTE_A4, NOTE_G4, NOTE_F4, NOTE_G4, NOTE_C4, NOTE_C4,
+  NOTE_D4, NOTE_D4, NOTE_E4, NOTE_F4, NOTE_F4, NOTE_G4, NOTE_A4, NOTE_B4, NOTE_C5, NOTE_D5,
+  NOTE_E5, NOTE_D5, NOTE_C5, NOTE_D5, NOTE_B4, NOTE_G4,
+  NOTE_C5, NOTE_B4, NOTE_A4, NOTE_B4, NOTE_E4, NOTE_E4,
+  NOTE_A4, NOTE_G4, NOTE_F4, NOTE_G4, NOTE_C4, NOTE_C4,
+  NOTE_C5, NOTE_B4, NOTE_A4, NOTE_G4, NOTE_B4, NOTE_C5, NOTE_D5,
+  NOTE_E5, NOTE_D5, NOTE_C5, NOTE_B4, NOTE_C5, NOTE_D5, NOTE_G4, NOTE_G4, NOTE_B4, NOTE_C5, NOTE_D5,
+  NOTE_C5, NOTE_B4, NOTE_A4, NOTE_G4, NOTE_A4, NOTE_B4, NOTE_E4, NOTE_E4, NOTE_G4, NOTE_A4, NOTE_B4,
+  NOTE_C5, NOTE_A4, NOTE_B4, NOTE_C5, NOTE_A4, NOTE_B4, NOTE_C5, NOTE_A4, NOTE_C5, NOTE_F5,
+  NOTE_F5, NOTE_E5, NOTE_D5, NOTE_C5, NOTE_D5, NOTE_E5, NOTE_C5, NOTE_C5,
+  NOTE_D5, NOTE_C5, NOTE_B4, NOTE_A4, NOTE_B4, NOTE_C5, NOTE_A4, NOTE_A4,
+  NOTE_C5, NOTE_B4, NOTE_A4, NOTE_G4, NOTE_C4, NOTE_G4, NOTE_A4, NOTE_B4, NOTE_C5
+};
+
+int noteDurations[] = {
+  8, 4, 6, 16, 4, 8, 8,
+  4, 6, 16, 4, 8, 8,
+  4, 8, 8, 4, 8, 8, 4, 8, 8, 2,
+  4, 6, 16, 4, 8, 8,
+  4, 6, 16, 4, 8, 8,
+  4, 6, 16, 4, 6, 16,
+  4, 6, 16, 8, 8, 8, 8,
+  2, 8, 8, 8, 8, 3, 8, 8, 8, 8, 8,
+  2, 8, 8, 8, 8, 3, 8, 8, 8, 8, 8,
+  4, 6, 16, 4, 6, 16, 4, 8, 8, 2,
+  2, 8, 8, 8, 8, 3, 8, 2,
+  2, 8, 8, 8, 8, 3, 8, 2,
+  4, 6, 16, 4, 4, 2, 4, 4, 1
+};
+
+  for (int thisNote = 0; thisNote < sizeof(melody) / 2; thisNote++) {
+    int noteDuration = 2000 / noteDurations[thisNote];
+    tone(buzzerPin, melody[thisNote], noteDuration);
+    int pauseBetweenNotes = noteDuration * 1.30;
+    delay(pauseBetweenNotes);
+    noTone(buzzerPin);
+  }
+
+}
+
+
+
+}
+
+
+long getRawDistance(int trigger, int echo)
+{
+  digitalWrite(trigger, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigger, HIGH); // Trigger pin to HIGH
+  delayMicroseconds(10); // 10us high
+  digitalWrite(trigger, LOW); // Trigger pin to HIGH
+ 
+  duration = pulseIn(echo,HIGH); // Waits for the echo pin to get high
+  return duration;
+}
+
+long distanceInMM(int trigger, int echo)
+{
+  long time = getRawDistance(trigger, echo);
+  // ((time)*(Speed of sound))/ toward and backward of object) * 10
+  long DistanceCalc; // Calculation variable
+  DistanceCalc = ((time /2.9) / 2); // Actual calculation in mm
+  return DistanceCalc; // return calculated value
+}
+
+
+
+
+void controlLeds(int r, int dur){
+    if(r == 0){
+      if(mil-cStartT > dur){
+      cStartT = mil;
+      }
+      if((mil - cStartT) % dur < dur/2)
+      {
+        digitalWrite(ledO1, HIGH);
+        digitalWrite(ledO2, LOW);
+        digitalWrite(ledO3, LOW);
+        digitalWrite(ledO4, LOW);
+        digitalWrite(ledI1, LOW);
+        digitalWrite(ledI2, LOW);
+        digitalWrite(ledI3, LOW);
+        digitalWrite(ledI4, LOW);
+        Serial.println(mil-cStartT);
+      }
+      else{
+        digitalWrite(ledO1, LOW);
+        digitalWrite(ledO2, LOW);
+        digitalWrite(ledO3, LOW);
+        digitalWrite(ledO4, LOW);
+        digitalWrite(ledI1, HIGH);
+        digitalWrite(ledI2, LOW);
+        digitalWrite(ledI3, LOW);
+        digitalWrite(ledI4, LOW);
+        Serial.println("inner");
+        if((mil - cStartT) % dur/2 < dur/2){
+          distance_mm1 = distanceInMM(trigger1, echo1);
+            if(distance_mm1 < 300){
+              checkIfTouched = 1;
+            }
+        }
+      }
+    }
+    else if(r == 1){
+      if(mil-cStartT > dur){
+      cStartT = mil;
+      }
+      if((mil - cStartT) % dur < dur/2){
+        digitalWrite(ledO1, LOW);
+        digitalWrite(ledO2, HIGH);
+        digitalWrite(ledO3, LOW);
+        digitalWrite(ledO4, LOW);
+        digitalWrite(ledI1, LOW);
+        digitalWrite(ledI2, LOW);
+        digitalWrite(ledI3, LOW);
+        digitalWrite(ledI4, LOW);
+        Serial.println(mil-cStartT);
+      }
+      else{
+        digitalWrite(ledO1, LOW);
+        digitalWrite(ledO2, LOW);
+        digitalWrite(ledO3, LOW);
+        digitalWrite(ledO4, LOW);
+        digitalWrite(ledI1, LOW);
+        digitalWrite(ledI2, HIGH);
+        digitalWrite(ledI3, LOW);
+        digitalWrite(ledI4, LOW);
+        Serial.println("inner");
+        if((mil - cStartT) % dur/2 < dur/2){
+          distance_mm2 = distanceInMM(trigger2, echo2);
+            if(distance_mm2 < 300){
+              checkIfTouched = 1;
+            }
+        }
+      }
+    }
+    else if(r == 2){
+      if(mil-cStartT > dur){
+      cStartT = mil;
+      }
+      if((mil - cStartT) % dur < dur/2){
+        digitalWrite(ledO1, LOW);
+        digitalWrite(ledO2, LOW);
+        digitalWrite(ledO3, HIGH);
+        digitalWrite(ledO4, LOW);
+        digitalWrite(ledI1, LOW);
+        digitalWrite(ledI2, LOW);
+        digitalWrite(ledI3, LOW);
+        digitalWrite(ledI4, LOW);
+        Serial.println(mil-cStartT);
+      }
+      else{
+        digitalWrite(ledO1, LOW);
+        digitalWrite(ledO2, LOW);
+        digitalWrite(ledO3, LOW);
+        digitalWrite(ledO4, LOW);
+        digitalWrite(ledI1, LOW);
+        digitalWrite(ledI2, LOW);
+        digitalWrite(ledI3, HIGH);
+        digitalWrite(ledI4, LOW);
+        Serial.println("inner");
+        if((mil - cStartT) % dur/2 < dur/2){
+          distance_mm3 = distanceInMM(trigger3, echo3);
+            if(distance_mm3 < 300){
+              checkIfTouched = 1;
+            }
+        }
+      }      
+    }
+    else{
+      if(mil-cStartT > dur){
+      cStartT = mil;
+      }
+      if((mil - cStartT) % dur < dur/2){
+        digitalWrite(ledO1, LOW);
+        digitalWrite(ledO2, LOW);
+        digitalWrite(ledO3, LOW);
+        digitalWrite(ledO4, HIGH);
+        digitalWrite(ledI1, LOW);
+        digitalWrite(ledI2, LOW);
+        digitalWrite(ledI3, LOW);
+        digitalWrite(ledI4, LOW);
+        Serial.println(mil-cStartT);
+      }
+      else{
+        digitalWrite(ledO1, LOW);
+        digitalWrite(ledO2, LOW);
+        digitalWrite(ledO3, LOW);
+        digitalWrite(ledO4, LOW);
+        digitalWrite(ledI1, LOW);
+        digitalWrite(ledI2, LOW);
+        digitalWrite(ledI3, LOW);
+        digitalWrite(ledI4, HIGH);
+        Serial.println("inner");
+        if((mil - cStartT) % dur/2 < dur/2){
+          distance_mm4 = distanceInMM(trigger4, echo4);
+            if(distance_mm4 < 300){
+              checkIfTouched = 1;
+            }
+        }
+      }  
+  }
+}
+
+void testLeds(){
+  if(mil % 2000 < 1000){
+    digitalWrite(ledO1, HIGH);
+    digitalWrite(ledO2, HIGH);
+    digitalWrite(ledO3, HIGH);
+    digitalWrite(ledO4, HIGH);
+    digitalWrite(ledI1, LOW);
+    digitalWrite(ledI2, LOW);
+    digitalWrite(ledI3, LOW);
+    digitalWrite(ledI4, LOW);
+  }
+  else{
+    digitalWrite(ledO1, LOW);
+    digitalWrite(ledO2, LOW);
+    digitalWrite(ledO3, LOW);
+    digitalWrite(ledO4, LOW);
+    digitalWrite(ledI1, HIGH);
+    digitalWrite(ledI2, HIGH);
+    digitalWrite(ledI3, HIGH);
+    digitalWrite(ledI4, HIGH);
+  }
+}
